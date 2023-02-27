@@ -7,21 +7,21 @@ import { ReactComponent as RefreshIcon } from "src/images/refresh.svg"
 const CardContainer = styled.div`
   position: relative;
   min-width: 360px;
-  box-shadow: 0 1px 3px 0 #999999;
-  background-color: #f9f9f9;
+  box-shadow: ${({ theme }: any) => theme.boxShadow};
+  background-color: ${({ theme }: any) => theme.foregroundColor};
   box-sizing: border-box;
   padding: 30px 15px;
 `
 
 const Location = styled.div`
   font-size: 28px;
-  color: #212121;
+  color: ${({ theme }: any) => theme.titleColor};
   margin-bottom: 20px;
 `
 
 const Description = styled.div`
   font-size: 16px;
-  color: #828282;
+  color: ${({ theme }: any) => theme.textColor};
   margin-bottom: 30px;
 `
 
@@ -33,7 +33,7 @@ const CurrentWeather = styled.div`
 `
 
 const Temperature = styled.div`
-  color: #757575;
+  color: ${({ theme }: any) => theme.temperatureColor};
   font-size: 96px;
   font-weight: 300;
   display: flex;
@@ -49,7 +49,7 @@ const AirFlow = styled.div`
   align-items: center;
   font-size: 16x;
   font-weight: 300;
-  color: #828282;
+  color: ${({ theme }: any) => theme.textColor};
   margin-bottom: 20px;
   svg {
     width: 25px;
@@ -63,7 +63,7 @@ const Rain = styled.div`
   align-items: center;
   font-size: 16x;
   font-weight: 300;
-  color: #828282;
+  color: ${({ theme }: any) => theme.textColor};
   svg {
     width: 25px;
     height: auto;
@@ -82,7 +82,7 @@ const Refresh = styled.div`
   font-size: 12px;
   display: inline-flex;
   align-items: flex-end;
-  color: #828282;
+  color: ${({ theme }: any) => theme.textColor};
   svg {
     margin-left: 10px;
     width: 15px;
@@ -95,22 +95,22 @@ const WeatherCard = () => {
   return (
     <CardContainer>
       <Location>台北市</Location>
-        <Description>多雲時晴</Description>
-        <CurrentWeather>
-          <Temperature>
-            23 <Celsius>°C</Celsius>
-          </Temperature>
-          <DayCloudy />
-        </CurrentWeather>
-        <AirFlow>
-          <AirFlowIcon /> 23 m/h
-        </AirFlow>
-        <Rain>
-          <RainIcon /> 48%
-        </Rain>
-        <Refresh>
-          最後觀測時間：上午 12:03 <RefreshIcon />
-        </Refresh>
+      <Description>多雲時晴</Description>
+      <CurrentWeather>
+        <Temperature>
+          23 <Celsius>°C</Celsius>
+        </Temperature>
+        <DayCloudy />
+      </CurrentWeather>
+      <AirFlow>
+        <AirFlowIcon /> 23 m/h
+      </AirFlow>
+      <Rain>
+        <RainIcon /> 48%
+      </Rain>
+      <Refresh>
+        最後觀測時間：上午 12:03 <RefreshIcon />
+      </Refresh>
     </CardContainer>
   )
 }

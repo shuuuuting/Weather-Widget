@@ -1,8 +1,11 @@
+import { ThemeProvider } from "@emotion/react"
 import styled from "@emotion/styled"
+import { useState } from "react"
+import { theme } from "src/assets/theme"
 import WeatherCard from "src/components/WeatherCard"
 
 const AppContainer = styled.div`
-  background-color: #ededed;
+  background-color: ${({ theme }: any)  => theme.backgroundColor};
   height: 100%;
   display: flex;
   align-items: center;
@@ -10,11 +13,15 @@ const AppContainer = styled.div`
 `
 
 const WeatherAppContainer = () => {
+  const [currentTheme, setCurrentTheme] = useState("dark")
+
   return (
-      <AppContainer>
+    <ThemeProvider theme={theme[currentTheme]}>
+        <AppContainer>
         <WeatherCard />
-      </AppContainer>
-  )
+        </AppContainer>
+    </ThemeProvider>
+    )
 }
 
 export default WeatherAppContainer
