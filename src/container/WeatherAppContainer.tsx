@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import WeatherCard from "src/components/WeatherCard"
 
-const Container = styled.div`
+const AppContainer = styled.div`
   background-color: #ededed;
   height: 100%;
   display: flex;
@@ -11,9 +11,9 @@ const Container = styled.div`
 
 const WeatherAppContainer = () => {
   return (
-      <Container>
+      <AppContainer>
         <WeatherCard />
-      </Container>
+      </AppContainer>
   )
 }
 
