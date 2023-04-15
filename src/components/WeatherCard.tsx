@@ -1,10 +1,11 @@
 import styled from "@emotion/styled"
 import { useState } from "react"
+import { fetchWeather } from "src/apis/Weather.api"
 import { ReactComponent as AirFlowIcon } from "src/images/airFlow.svg"
 import { ReactComponent as DayCloudyIcon } from "src/images/day-cloudy.svg"
 import { ReactComponent as RainIcon } from "src/images/rain.svg"
 import { ReactComponent as RefreshIcon } from "src/images/refresh.svg"
-import { IWeather } from "src/types/WeatherType"
+import { IWeather, IWeatherElement } from "src/types/Weather.type"
 
 const CardContainer = styled.div`
   position: relative;
@@ -103,6 +104,28 @@ const WeatherCard = () => {
     observationTime: "2020-12-12 22:10:00",
   })
 
+  const handleClick = async () => {
+    const res = await fetchWeather()
+    if ("data" in res) {
+      const locationData = res.data.location[0]
+      const weatherElements = locationData.weatherElement.reduce(
+        (neededElements: { [key: string]: string }, item: IWeatherElement) => {
+          if (["WDSD", "TEMP"].includes(item.elementName)) {
+            neededElements[item.elementName] = item.elementValue
+          }
+          return neededElements
+      }, {})
+      setCurrWeather({
+        locationName: locationData.locationName,
+        description: "多雲時晴",
+        windSpeed: weatherElements.WDSD,
+        temperature: weatherElements.TEMP,
+        rainPossibility: 60,
+        observationTime: locationData.time.obsTime,
+      })
+    }
+  }
+
   return (
     <CardContainer>
       <Location>{currWeather.locationName}</Location>
@@ -119,7 +142,7 @@ const WeatherCard = () => {
       <Rain>
         <RainIcon /> {currWeather.rainPossibility}%
       </Rain>
-      <Refresh>
+      <Refresh onClick={handleClick}>
         最後觀測時間：
         {new Intl.DateTimeFormat("zh-TW", {
           hour: "numeric",
