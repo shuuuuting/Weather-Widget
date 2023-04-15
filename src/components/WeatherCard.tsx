@@ -1,10 +1,11 @@
 import styled from "@emotion/styled"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { fetchWeather } from "src/apis/Weather.api"
 import { ReactComponent as AirFlowIcon } from "src/images/airFlow.svg"
 import { ReactComponent as DayCloudyIcon } from "src/images/day-cloudy.svg"
 import { ReactComponent as RainIcon } from "src/images/rain.svg"
 import { ReactComponent as RefreshIcon } from "src/images/refresh.svg"
+import { ReactComponent as LoadingIcon } from "src/images/loading.svg"
 import { IWeather, IWeatherElement } from "src/types/Weather.type"
 
 const CardContainer = styled.div`
@@ -78,7 +79,7 @@ const DayCloudy = styled(DayCloudyIcon)`
   flex-basis: 30%;
 `
 
-const Refresh = styled.div`
+const Refresh = styled.div<{ isLoading: Boolean }>`
   position: absolute;
   right: 15px;
   bottom: 15px;
@@ -86,15 +87,28 @@ const Refresh = styled.div`
   display: inline-flex;
   align-items: flex-end;
   color: ${({ theme }: any) => theme.textColor};
+
   svg {
     margin-left: 10px;
     width: 15px;
     height: 15px;
     cursor: pointer;
+    animation: rotate infinite 1.5s linear;
+    animation-duration: ${({ isLoading }) => (isLoading ? "1.5s" : "0s")};
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(360deg);
+    }
+    to {
+      transform: rotate(0deg);
+    }
   }
 `
 
 const WeatherCard = () => {
+  const [isLoading, setIsLoading] = useState<Boolean>(true)
   const [currWeather, setCurrWeather] = useState<IWeather>({
     locationName: "台北市",
     description: "多雲時晴",
@@ -104,7 +118,14 @@ const WeatherCard = () => {
     observationTime: "2020-12-12 22:10:00",
   })
 
-  const handleClick = async () => {
+  const { locationName, description, windSpeed, temperature, rainPossibility, observationTime } = currWeather
+
+  useEffect(() => {
+    getRealTimeWeather()
+  }, [])
+
+  const getRealTimeWeather = async () => {
+    setIsLoading(true)
     const res = await fetchWeather()
     if ("data" in res) {
       const locationData = res.data.location[0]
@@ -114,7 +135,9 @@ const WeatherCard = () => {
             neededElements[item.elementName] = item.elementValue
           }
           return neededElements
-      }, {})
+        },
+        {}
+      )
       setCurrWeather({
         locationName: locationData.locationName,
         description: "多雲時晴",
@@ -123,32 +146,33 @@ const WeatherCard = () => {
         rainPossibility: 60,
         observationTime: locationData.time.obsTime,
       })
+      setIsLoading(false)
     }
   }
 
   return (
     <CardContainer>
-      <Location>{currWeather.locationName}</Location>
-      <Description>{currWeather.description}</Description>
+      <Location>{locationName}</Location>
+      <Description>{description}</Description>
       <CurrentWeather>
         <Temperature>
-          {Math.round(currWeather.temperature)} <Celsius>°C</Celsius>
+          {Math.round(temperature)} <Celsius>°C</Celsius>
         </Temperature>
         <DayCloudy />
       </CurrentWeather>
       <AirFlow>
-        <AirFlowIcon /> {currWeather.windSpeed} m/h
+        <AirFlowIcon /> {windSpeed} m/h
       </AirFlow>
       <Rain>
-        <RainIcon /> {currWeather.rainPossibility}%
+        <RainIcon /> {rainPossibility}%
       </Rain>
-      <Refresh onClick={handleClick}>
+      <Refresh onClick={getRealTimeWeather} isLoading={isLoading}>
         最後觀測時間：
         {new Intl.DateTimeFormat("zh-TW", {
           hour: "numeric",
           minute: "numeric",
-        }).format(new Date(currWeather.observationTime))}
-        <RefreshIcon />
+        }).format(new Date(observationTime))}
+        {isLoading ? <LoadingIcon /> : <RefreshIcon />}
       </Refresh>
     </CardContainer>
   )
