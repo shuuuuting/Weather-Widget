@@ -13,10 +13,10 @@ const AppContainer = styled.div`
 `
 
 const WeatherAppContainer = () => {
-  const [currentTheme, setCurrentTheme] = useState("dark")
+  const [currTheme, setCurrTheme] = useState("dark")
 
   return (
-    <ThemeProvider theme={theme[currentTheme]}>
+    <ThemeProvider theme={theme[currTheme]}>
         <AppContainer>
         <WeatherCard />
         </AppContainer>

@@ -1,8 +1,10 @@
 import styled from "@emotion/styled"
+import { useState } from "react"
 import { ReactComponent as AirFlowIcon } from "src/images/airFlow.svg"
 import { ReactComponent as DayCloudyIcon } from "src/images/day-cloudy.svg"
 import { ReactComponent as RainIcon } from "src/images/rain.svg"
 import { ReactComponent as RefreshIcon } from "src/images/refresh.svg"
+import { IWeather } from "src/types/WeatherType"
 
 const CardContainer = styled.div`
   position: relative;
@@ -92,24 +94,38 @@ const Refresh = styled.div`
 `
 
 const WeatherCard = () => {
+  const [currWeather, setCurrWeather] = useState<IWeather>({
+    locationName: "台北市",
+    description: "多雲時晴",
+    windSpeed: 1.1,
+    temperature: 22.9,
+    rainPossibility: 48.3,
+    observationTime: "2020-12-12 22:10:00",
+  })
+
   return (
     <CardContainer>
-      <Location>台北市</Location>
-      <Description>多雲時晴</Description>
+      <Location>{currWeather.locationName}</Location>
+      <Description>{currWeather.description}</Description>
       <CurrentWeather>
         <Temperature>
-          23 <Celsius>°C</Celsius>
+          {Math.round(currWeather.temperature)} <Celsius>°C</Celsius>
         </Temperature>
         <DayCloudy />
       </CurrentWeather>
       <AirFlow>
-        <AirFlowIcon /> 23 m/h
+        <AirFlowIcon /> {currWeather.windSpeed} m/h
       </AirFlow>
       <Rain>
-        <RainIcon /> 48%
+        <RainIcon /> {currWeather.rainPossibility}%
       </Rain>
       <Refresh>
-        最後觀測時間：上午 12:03 <RefreshIcon />
+        最後觀測時間：
+        {new Intl.DateTimeFormat("zh-TW", {
+          hour: "numeric",
+          minute: "numeric",
+        }).format(new Date(currWeather.observationTime))}
+        <RefreshIcon />
       </Refresh>
     </CardContainer>
   )
