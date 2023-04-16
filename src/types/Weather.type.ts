@@ -1,14 +1,25 @@
 export type IWeather = {
   locationName: string
   description: string
+  weatherCode: number
   windSpeed: number
   temperature: number
   rainPossibility: number
   observationTime: string
+  comfortability: string
 }
 
 export type IWeatherElement = {
   elementName: string
   elementValue: string
+  time: ITimeElement[]
 }
 
+type ITimeElement = {
+  startTime: string
+  endTime: string
+  parameter: { 
+    parameterName: string 
+    parameterValue: string 
+}
+}

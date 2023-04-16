@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { useEffect, useState } from "react"
-import { fetchWeather } from "src/apis/Weather.api"
+import { fetchRealTimeWeather, fetchWeatherForecast } from "src/apis/Weather.api"
 import { ReactComponent as AirFlowIcon } from "src/images/airFlow.svg"
 import { ReactComponent as DayCloudyIcon } from "src/images/day-cloudy.svg"
 import { ReactComponent as RainIcon } from "src/images/rain.svg"
@@ -109,24 +109,36 @@ const Refresh = styled.div<{ isLoading: Boolean }>`
 
 const WeatherCard = () => {
   const [isLoading, setIsLoading] = useState<Boolean>(true)
-  const [currWeather, setCurrWeather] = useState<IWeather>({
+  const [weather, setWeather] = useState<IWeather>({
     locationName: "台北市",
     description: "多雲時晴",
+    weatherCode: 0,
     windSpeed: 1.1,
     temperature: 22.9,
     rainPossibility: 48.3,
     observationTime: "2020-12-12 22:10:00",
+    comfortability: "舒適"
   })
 
-  const { locationName, description, windSpeed, temperature, rainPossibility, observationTime } = currWeather
+const { 
+    locationName, 
+    description, 
+    weatherCode,
+    windSpeed, 
+    temperature, 
+    rainPossibility, 
+    observationTime, 
+    comfortability
+  } = weather
 
   useEffect(() => {
     getRealTimeWeather()
+    getWeatherForecast()
   }, [])
 
   const getRealTimeWeather = async () => {
     setIsLoading(true)
-    const res = await fetchWeather()
+    const res = await fetchRealTimeWeather()
     if ("data" in res) {
       const locationData = res.data.location[0]
       const weatherElements = locationData.weatherElement.reduce(
@@ -138,22 +150,49 @@ const WeatherCard = () => {
         },
         {}
       )
-      setCurrWeather({
+      setWeather((prevWeather) => ({
+        ...prevWeather,
         locationName: locationData.locationName,
-        description: "多雲時晴",
         windSpeed: weatherElements.WDSD,
         temperature: weatherElements.TEMP,
-        rainPossibility: 60,
         observationTime: locationData.time.obsTime,
-      })
+      }))
       setIsLoading(false)
     }
+  }
+
+  const getWeatherForecast = async () => {
+    const res = await fetchWeatherForecast()
+    if ("data" in res) {
+      const locationData = res.data.location[0]
+      const weatherElements = locationData.weatherElement.reduce(
+        (neededElements: { [key: string]: any }, item: IWeatherElement) => {
+          if (["Wx", "PoP", "CI"].includes(item.elementName)) {
+            neededElements[item.elementName] = item.time[0].parameter
+          }
+          return neededElements
+        },
+        {}
+      )
+      setWeather((prevWeather) => ({
+        ...prevWeather,
+        description: weatherElements.Wx.parameterName,
+        weatherCode: weatherElements.Wx.parameterValue,
+        rainPossibility: weatherElements.PoP.parameterName,
+        comfortability: weatherElements.CI.parameterName,
+      }))
+    }
+  }
+
+  const handleRefresh = () => {
+    getRealTimeWeather()
+    getWeatherForecast()
   }
 
   return (
     <CardContainer>
       <Location>{locationName}</Location>
-      <Description>{description}</Description>
+      <Description>{description}{comfortability}</Description>
       <CurrentWeather>
         <Temperature>
           {Math.round(temperature)} <Celsius>°C</Celsius>
@@ -166,7 +205,10 @@ const WeatherCard = () => {
       <Rain>
         <RainIcon /> {rainPossibility}%
       </Rain>
-      <Refresh onClick={getRealTimeWeather} isLoading={isLoading}>
+      <Refresh 
+        isLoading={isLoading} 
+        onClick={handleRefresh}
+      >
         最後觀測時間：
         {new Intl.DateTimeFormat("zh-TW", {
           hour: "numeric",
