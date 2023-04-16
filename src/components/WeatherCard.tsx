@@ -180,8 +180,8 @@ const WeatherCard = () => {
   const fetchWeatherData = async () => {
     setIsLoading(true)
     const [realTimeWeather, weatherForecast] = await Promise.all([
-      getRealTimeWeather,
-      getWeatherForecast,
+      getRealTimeWeather(),
+      getWeatherForecast(),
     ])
     setWeather((prevWeather) => ({
         ...prevWeather,
@@ -192,8 +192,7 @@ const WeatherCard = () => {
   }
 
   useEffect(() => {
-    getRealTimeWeather()
-    getWeatherForecast()
+    fetchWeatherData()
   }, [])
 
   return (
