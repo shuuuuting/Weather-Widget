@@ -107,6 +107,52 @@ const Refresh = styled.div<{ isLoading: Boolean }>`
   }
 `
 
+const getRealTimeWeather = async () => {
+  const res = await fetchRealTimeWeather()
+  if ("data" in res) {
+    const locationData = res.data.location[0]
+    const weatherElements = locationData.weatherElement.reduce(
+      (neededElements: { [key: string]: string }, item: IWeatherElement) => {
+        if (["WDSD", "TEMP"].includes(item.elementName)) {
+          neededElements[item.elementName] = item.elementValue
+        }
+        return neededElements
+      },
+      {}
+    )
+    return {
+      locationName: locationData.locationName,
+      windSpeed: weatherElements.WDSD,
+      temperature: weatherElements.TEMP,
+      observationTime: locationData.time.obsTime,
+    }
+  }
+  return {}
+}
+
+const getWeatherForecast = async () => {
+  const res = await fetchWeatherForecast()
+  if ("data" in res) {
+    const locationData = res.data.location[0]
+    const weatherElements = locationData.weatherElement.reduce(
+      (neededElements: { [key: string]: any }, item: IWeatherElement) => {
+        if (["Wx", "PoP", "CI"].includes(item.elementName)) {
+          neededElements[item.elementName] = item.time[0].parameter
+        }
+        return neededElements
+      },
+      {}
+    )
+    return {
+      description: weatherElements.Wx.parameterName,
+      weatherCode: weatherElements.Wx.parameterValue,
+      rainPossibility: weatherElements.PoP.parameterName,
+      comfortability: weatherElements.CI.parameterName,
+    }
+  }
+  return {}
+}
+
 const WeatherCard = () => {
   const [isLoading, setIsLoading] = useState<Boolean>(true)
   const [weather, setWeather] = useState<IWeather>({
@@ -117,82 +163,46 @@ const WeatherCard = () => {
     temperature: 22.9,
     rainPossibility: 48.3,
     observationTime: "2020-12-12 22:10:00",
-    comfortability: "舒適"
+    comfortability: "舒適",
   })
 
-const { 
-    locationName, 
-    description, 
+  const {
+    locationName,
+    description,
     weatherCode,
-    windSpeed, 
-    temperature, 
-    rainPossibility, 
-    observationTime, 
-    comfortability
+    windSpeed,
+    temperature,
+    rainPossibility,
+    observationTime,
+    comfortability,
   } = weather
+
+  const fetchWeatherData = async () => {
+    setIsLoading(true)
+    const [realTimeWeather, weatherForecast] = await Promise.all([
+      getRealTimeWeather,
+      getWeatherForecast,
+    ])
+    setWeather((prevWeather) => ({
+        ...prevWeather,
+        ...realTimeWeather,
+        ...weatherForecast
+    }))
+    setIsLoading(false)
+  }
 
   useEffect(() => {
     getRealTimeWeather()
     getWeatherForecast()
   }, [])
 
-  const getRealTimeWeather = async () => {
-    setIsLoading(true)
-    const res = await fetchRealTimeWeather()
-    if ("data" in res) {
-      const locationData = res.data.location[0]
-      const weatherElements = locationData.weatherElement.reduce(
-        (neededElements: { [key: string]: string }, item: IWeatherElement) => {
-          if (["WDSD", "TEMP"].includes(item.elementName)) {
-            neededElements[item.elementName] = item.elementValue
-          }
-          return neededElements
-        },
-        {}
-      )
-      setWeather((prevWeather) => ({
-        ...prevWeather,
-        locationName: locationData.locationName,
-        windSpeed: weatherElements.WDSD,
-        temperature: weatherElements.TEMP,
-        observationTime: locationData.time.obsTime,
-      }))
-      setIsLoading(false)
-    }
-  }
-
-  const getWeatherForecast = async () => {
-    const res = await fetchWeatherForecast()
-    if ("data" in res) {
-      const locationData = res.data.location[0]
-      const weatherElements = locationData.weatherElement.reduce(
-        (neededElements: { [key: string]: any }, item: IWeatherElement) => {
-          if (["Wx", "PoP", "CI"].includes(item.elementName)) {
-            neededElements[item.elementName] = item.time[0].parameter
-          }
-          return neededElements
-        },
-        {}
-      )
-      setWeather((prevWeather) => ({
-        ...prevWeather,
-        description: weatherElements.Wx.parameterName,
-        weatherCode: weatherElements.Wx.parameterValue,
-        rainPossibility: weatherElements.PoP.parameterName,
-        comfortability: weatherElements.CI.parameterName,
-      }))
-    }
-  }
-
-  const handleRefresh = () => {
-    getRealTimeWeather()
-    getWeatherForecast()
-  }
-
   return (
     <CardContainer>
       <Location>{locationName}</Location>
-      <Description>{description}{comfortability}</Description>
+      <Description>
+        {description}
+        {comfortability}
+      </Description>
       <CurrentWeather>
         <Temperature>
           {Math.round(temperature)} <Celsius>°C</Celsius>
@@ -205,10 +215,7 @@ const {
       <Rain>
         <RainIcon /> {rainPossibility}%
       </Rain>
-      <Refresh 
-        isLoading={isLoading} 
-        onClick={handleRefresh}
-      >
+      <Refresh isLoading={isLoading} onClick={fetchWeatherData}>
         最後觀測時間：
         {new Intl.DateTimeFormat("zh-TW", {
           hour: "numeric",
