@@ -1,12 +1,13 @@
 import styled from "@emotion/styled"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { fetchRealTimeWeather, fetchWeatherForecast } from "src/apis/Weather.api"
 import { ReactComponent as AirFlowIcon } from "src/images/airFlow.svg"
-import { ReactComponent as DayCloudyIcon } from "src/images/day-cloudy.svg"
 import { ReactComponent as RainIcon } from "src/images/rain.svg"
 import { ReactComponent as RefreshIcon } from "src/images/refresh.svg"
 import { ReactComponent as LoadingIcon } from "src/images/loading.svg"
 import { IWeather, IWeatherElement } from "src/types/Weather.type"
+import WeatherIcon from "./ＷeatherIcon"
+import { getMoment } from "src/utils/MomentGetter"
 
 const CardContainer = styled.div`
   position: relative;
@@ -73,10 +74,6 @@ const Rain = styled.div`
     height: auto;
     margin-right: 30px;
   }
-`
-
-const DayCloudy = styled(DayCloudyIcon)`
-  flex-basis: 30%;
 `
 
 const Refresh = styled.div<{ isLoading: Boolean }>`
@@ -177,6 +174,8 @@ const WeatherCard = () => {
     comfortability,
   } = weather
 
+  const moment = useMemo(() => getMoment("臺北市"), [locationName])
+
   const fetchWeatherData = async () => {
     setIsLoading(true)
     const [realTimeWeather, weatherForecast] = await Promise.all([
@@ -206,7 +205,7 @@ const WeatherCard = () => {
         <Temperature>
           {Math.round(temperature)} <Celsius>°C</Celsius>
         </Temperature>
-        <DayCloudy />
+        <WeatherIcon weatherCode={weatherCode} moment={moment}/>
       </CurrentWeather>
       <AirFlow>
         <AirFlowIcon /> {windSpeed} m/h

@@ -8,33 +8,33 @@ const FORECAST_KEY = "F-C0032-001"
 const LOCATION = "臺北"
 
 export const fetchRealTimeWeather = async (): Promise<ApiResponse> => {
-    try {
-        const res = await axios.get(BASE_URL + REALTIME_KEY, {
-            params: {
-                Authorization: AUTH_TOKEN,
-                locationName: LOCATION
-            }
-        })
-        if (res.data.success === "true" ) return { data: res.data.records }
-        else return { error: res.data.msg }
-    } catch (e) {
-        console.log(e)
-        return { error: "Fail: internal service error happened while fetching country data"}
-    }
+  try {
+    const res = await axios.get(BASE_URL + REALTIME_KEY, {
+      params: {
+        Authorization: AUTH_TOKEN,
+        locationName: LOCATION,
+      },
+    })
+    if (res.data.success === "true") return { data: res.data.records }
+    else return { error: res.data.msg }
+  } catch (e) {
+    console.log(e)
+    return { error: "Fail: internal service error happened while fetching country data" }
+  }
 }
 
 export const fetchWeatherForecast = async (): Promise<ApiResponse> => {
-    try {
-        const res = await axios.get(BASE_URL + FORECAST_KEY, {
-            params: {
-                Authorization: AUTH_TOKEN,
-                locationName: LOCATION + "市"
-            }
-        })
-        if (res.data.success === "true" ) return { data: res.data.records }
-        else return { error: res.data.msg }
-    } catch (e) {
-        console.log(e)
-        return { error: "Fail: internal service error happened while fetching country data"}
-    }
+  try {
+    const res = await axios.get(BASE_URL + FORECAST_KEY, {
+      params: {
+        Authorization: AUTH_TOKEN,
+        locationName: LOCATION + "市",
+      },
+    })
+    if (res.data.success === "true") return { data: res.data.records }
+    else return { error: res.data.msg }
+  } catch (e) {
+    console.log(e)
+    return { error: "Fail: internal service error happened while fetching country data" }
+  }
 }
