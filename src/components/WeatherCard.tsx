@@ -8,6 +8,7 @@ import { ReactComponent as LoadingIcon } from "src/images/loading.svg"
 import { IWeather, IWeatherElement } from "src/types/Weather.type"
 import WeatherIcon from "./ＷeatherIcon"
 import { getMoment } from "src/utils/MomentGetter"
+import useWeatherAPI from "src/hooks/useWeatherAPI"
 
 const CardContainer = styled.div`
   position: relative;
@@ -104,63 +105,11 @@ const Refresh = styled.div<{ isLoading: Boolean }>`
   }
 `
 
-const getRealTimeWeather = async () => {
-  const res = await fetchRealTimeWeather()
-  if ("data" in res) {
-    const locationData = res.data.location[0]
-    const weatherElements = locationData.weatherElement.reduce(
-      (neededElements: { [key: string]: string }, item: IWeatherElement) => {
-        if (["WDSD", "TEMP"].includes(item.elementName)) {
-          neededElements[item.elementName] = item.elementValue
-        }
-        return neededElements
-      },
-      {}
-    )
-    return {
-      locationName: locationData.locationName,
-      windSpeed: weatherElements.WDSD,
-      temperature: weatherElements.TEMP,
-      observationTime: locationData.time.obsTime,
-    }
-  }
-  return {}
-}
-
-const getWeatherForecast = async () => {
-  const res = await fetchWeatherForecast()
-  if ("data" in res) {
-    const locationData = res.data.location[0]
-    const weatherElements = locationData.weatherElement.reduce(
-      (neededElements: { [key: string]: any }, item: IWeatherElement) => {
-        if (["Wx", "PoP", "CI"].includes(item.elementName)) {
-          neededElements[item.elementName] = item.time[0].parameter
-        }
-        return neededElements
-      },
-      {}
-    )
-    return {
-      description: weatherElements.Wx.parameterName,
-      weatherCode: weatherElements.Wx.parameterValue,
-      rainPossibility: weatherElements.PoP.parameterName,
-      comfortability: weatherElements.CI.parameterName,
-    }
-  }
-  return {}
-}
-
 const WeatherCard = () => {
-  const [isLoading, setIsLoading] = useState<Boolean>(true)
-  const [weather, setWeather] = useState<IWeather>({
-    locationName: "台北市",
-    description: "多雲時晴",
-    weatherCode: 0,
-    windSpeed: 1.1,
-    temperature: 22.9,
-    rainPossibility: 48.3,
-    observationTime: "2020-12-12 22:10:00",
-    comfortability: "舒適",
+  const [isLoading, setIsLoading] = useState<Boolean>(false)
+  const [weather, fetchWeatherData]: any = useWeatherAPI({
+    locationName: "臺北",
+    cityName: "臺北市"
   })
 
   const {
@@ -175,24 +124,6 @@ const WeatherCard = () => {
   } = weather
 
   const moment = useMemo(() => getMoment("臺北市"), [locationName])
-
-  const fetchWeatherData = async () => {
-    setIsLoading(true)
-    const [realTimeWeather, weatherForecast] = await Promise.all([
-      getRealTimeWeather(),
-      getWeatherForecast(),
-    ])
-    setWeather((prevWeather) => ({
-        ...prevWeather,
-        ...realTimeWeather,
-        ...weatherForecast
-    }))
-    setIsLoading(false)
-  }
-
-  useEffect(() => {
-    fetchWeatherData()
-  }, [])
 
   return (
     <CardContainer>

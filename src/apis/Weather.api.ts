@@ -5,14 +5,13 @@ const AUTH_TOKEN = "CWB-0CD4EF1A-51A3-4093-8B9E-A9EB60C8C09D"
 const BASE_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/"
 const REALTIME_KEY = "O-A0003-001"
 const FORECAST_KEY = "F-C0032-001"
-const LOCATION = "臺北"
 
-export const fetchRealTimeWeather = async (): Promise<ApiResponse> => {
+export const fetchRealTimeWeather = async (locationName: string): Promise<ApiResponse> => {
   try {
     const res = await axios.get(BASE_URL + REALTIME_KEY, {
       params: {
         Authorization: AUTH_TOKEN,
-        locationName: LOCATION,
+        locationName
       },
     })
     if (res.data.success === "true") return { data: res.data.records }
@@ -23,12 +22,12 @@ export const fetchRealTimeWeather = async (): Promise<ApiResponse> => {
   }
 }
 
-export const fetchWeatherForecast = async (): Promise<ApiResponse> => {
+export const fetchWeatherForecast = async (cityName: string): Promise<ApiResponse> => {
   try {
     const res = await axios.get(BASE_URL + FORECAST_KEY, {
       params: {
         Authorization: AUTH_TOKEN,
-        locationName: LOCATION + "市",
+        locationName: cityName,
       },
     })
     if (res.data.success === "true") return { data: res.data.records }
