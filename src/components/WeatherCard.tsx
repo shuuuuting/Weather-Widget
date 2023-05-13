@@ -9,6 +9,9 @@ import { IWeather, IWeatherElement } from "src/types/Weather.type"
 import WeatherIcon from "./ＷeatherIcon"
 import { getMoment } from "src/utils/MomentGetter"
 import useWeatherAPI from "src/hooks/useWeatherAPI"
+import { useAppDispatch, useAppSelector } from "src/app/hooks"
+import { saveTheme, selectIsLoading } from "src/slices/statusSlice"
+import { Button } from "@mui/material"
 
 const CardContainer = styled.div`
   position: relative;
@@ -105,11 +108,15 @@ const Refresh = styled.div<{ isLoading: Boolean }>`
   }
 `
 
+const LOCATION_NAME = "臺北"
+const CITY_NAME = "臺北市"
+
 const WeatherCard = () => {
-  const [isLoading, setIsLoading] = useState<Boolean>(false)
+  const dispatch = useAppDispatch()
+  const isLoading = useAppSelector(selectIsLoading)
   const [weather, fetchWeatherData]: any = useWeatherAPI({
-    locationName: "臺北",
-    cityName: "臺北市"
+    locationName: LOCATION_NAME,
+    cityName: CITY_NAME,
   })
 
   const {
@@ -123,7 +130,11 @@ const WeatherCard = () => {
     comfortability,
   } = weather
 
-  const moment = useMemo(() => getMoment("臺北市"), [locationName])
+  const moment = useMemo(() => getMoment(CITY_NAME), [locationName])
+
+  useEffect(() => {
+    dispatch(saveTheme(moment === "day" ? "light" : "dark"))
+  }, [moment])
 
   return (
     <CardContainer>
@@ -136,7 +147,7 @@ const WeatherCard = () => {
         <Temperature>
           {Math.round(temperature)} <Celsius>°C</Celsius>
         </Temperature>
-        <WeatherIcon weatherCode={weatherCode} moment={moment}/>
+        <WeatherIcon weatherCode={weatherCode} moment={moment} />
       </CurrentWeather>
       <AirFlow>
         <AirFlowIcon /> {windSpeed} m/h

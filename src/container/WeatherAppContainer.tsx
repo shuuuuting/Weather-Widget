@@ -1,8 +1,9 @@
 import { ThemeProvider } from "@emotion/react"
 import styled from "@emotion/styled"
-import { useState } from "react"
+import { useAppSelector } from "src/app/hooks"
 import { theme } from "src/assets/theme"
 import WeatherCard from "src/components/WeatherCard"
+import { selectTheme } from "src/slices/statusSlice"
 
 const AppContainer = styled.div`
   background-color: ${({ theme }: any)  => theme.backgroundColor};
@@ -13,7 +14,7 @@ const AppContainer = styled.div`
 `
 
 const WeatherAppContainer = () => {
-  const [currTheme, setCurrTheme] = useState("dark")
+  const currTheme = useAppSelector(selectTheme)
 
   return (
     <ThemeProvider theme={theme[currTheme]}>

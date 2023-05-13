@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
+import { useAppDispatch } from '../app/hooks'
 import { fetchRealTimeWeather, fetchWeatherForecast } from "src/apis/Weather.api"
 import {
   IRealTimeWeather,
@@ -6,6 +7,7 @@ import {
   IWeatherElement,
   IWeatherForecast,
 } from "src/types/Weather.type"
+import { saveIsLoading } from "src/slices/statusSlice"
 
 const getRealTimeWeather = async (locationName: string) => {
   const res = await fetchRealTimeWeather(locationName)
@@ -64,7 +66,8 @@ const getWeatherForecast = async (cityName: string) => {
 }
 
 const useWeatherAPI = ({ locationName, cityName }: { locationName: string; cityName: string }) => {
-  const [weather, setWeather] = useState<IWeather>({
+  const dispatch = useAppDispatch()
+    const [weather, setWeather] = useState<IWeather>({
     locationName: "",
     description: "",
     weatherCode: 0,
@@ -76,6 +79,7 @@ const useWeatherAPI = ({ locationName, cityName }: { locationName: string; cityN
   })
 
   const fetchWeatherData = useCallback(async () => {
+    dispatch(saveIsLoading(true))
     const [realTimeWeather, weatherForecast] = await Promise.all([
       getRealTimeWeather(locationName),
       getWeatherForecast(cityName),
@@ -85,6 +89,8 @@ const useWeatherAPI = ({ locationName, cityName }: { locationName: string; cityN
       ...realTimeWeather,
       ...weatherForecast,
     })
+    dispatch(saveIsLoading(false))
+
   }, [locationName, cityName])
 
   useEffect(() => {
