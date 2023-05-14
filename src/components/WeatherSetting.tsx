@@ -1,6 +1,8 @@
 import styled from "@emotion/styled"
 import { availableLocations } from "../utils/LocationMappings"
 import { ILocation } from "src/types/Weather.type"
+import { useAppDispatch } from "src/app/hooks"
+import { saveCurrPage } from "src/slices/statusSlice"
 
 const SettingContainer = styled.div`
   position: relative;
@@ -91,6 +93,12 @@ const Save = styled.button`
 `
 
 const WeatherSetting = () => {
+  const dispatch = useAppDispatch()
+
+  const handlePageChange = () => {
+    dispatch(saveCurrPage("WeatherCard"))
+  }
+
   return (
     <SettingContainer>
       <Title>設定</Title>
@@ -105,7 +113,7 @@ const WeatherSetting = () => {
       </StyledSelect>
 
       <ButtonGroup>
-        <Back>返回</Back>
+        <Back onClick={handlePageChange}>返回</Back>
         <Save>儲存</Save>
       </ButtonGroup>
     </SettingContainer>

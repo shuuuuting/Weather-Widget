@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import styled from "@emotion/styled"
 
 import { ReactComponent as DayClear } from "./../images/day-clear.svg"

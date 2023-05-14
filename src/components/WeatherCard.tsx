@@ -4,11 +4,12 @@ import { ReactComponent as AirFlowIcon } from "src/images/airFlow.svg"
 import { ReactComponent as RainIcon } from "src/images/rain.svg"
 import { ReactComponent as RefreshIcon } from "src/images/refresh.svg"
 import { ReactComponent as LoadingIcon } from "src/images/loading.svg"
+import { ReactComponent as CogIcon } from "src/images/cog.svg"
 import WeatherIcon from "./ＷeatherIcon"
 import { getMoment } from "src/utils/MomentGetter"
 import useWeatherAPI from "src/hooks/useWeatherAPI"
 import { useAppDispatch, useAppSelector } from "src/app/hooks"
-import { saveTheme, selectIsLoading } from "src/slices/statusSlice"
+import { saveCurrPage, saveCurrTheme, selectIsLoading } from "src/slices/statusSlice"
 
 const CardContainer = styled.div`
   position: relative;
@@ -105,6 +106,15 @@ const Refresh = styled.div<{ isLoading: Boolean }>`
   }
 `
 
+const Cog = styled(CogIcon)`
+  position: absolute;
+  top: 30px;
+  right: 15px;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+`
+
 const LOCATION_NAME = "臺北"
 const CITY_NAME = "臺北市"
 
@@ -130,11 +140,16 @@ const WeatherCard = () => {
   const moment = useMemo(() => getMoment(CITY_NAME), [locationName])
 
   useEffect(() => {
-    dispatch(saveTheme(moment === "day" ? "light" : "dark"))
+    dispatch(saveCurrTheme(moment === "day" ? "light" : "dark"))
   }, [moment])
+
+  const handlePageChange = () => {
+    dispatch(saveCurrPage("WeatherSetting"))
+  }
 
   return (
     <CardContainer>
+      <Cog onClick={handlePageChange}/>
       <Location>{locationName}</Location>
       <Description>
         {description}
