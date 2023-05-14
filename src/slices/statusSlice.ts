@@ -4,12 +4,14 @@ import { RootState } from "../app/store"
 export interface StatusState {
   currTheme: "light" | "dark"
   currPage: "WeatherCard" | "WeatherSetting"
+  locatedCity: string
   isLoading: boolean
 }
 
 const initialState: StatusState = {
   currTheme: "dark",
   currPage: "WeatherCard",
+  locatedCity: "臺北市",
   isLoading: true,
 }
 
@@ -42,6 +44,9 @@ export const statusSlice = createSlice({
     saveCurrPage: (state, { payload }) => {
       state.currPage = payload
     },
+    saveLocatedCity: (state, { payload }) => {
+      state.locatedCity = payload
+    },
     saveIsLoading: (state, { payload }) => {
       state.isLoading = payload
     },
@@ -63,13 +68,14 @@ export const statusSlice = createSlice({
   // },
 })
 
-export const { saveCurrTheme, saveCurrPage, saveIsLoading } = statusSlice.actions
+export const { saveCurrTheme, saveCurrPage, saveLocatedCity, saveIsLoading } = statusSlice.actions
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
 export const selectCurrTheme = (state: RootState) => state.status.currTheme
 export const selectCurrPage = (state: RootState) => state.status.currPage
+export const selectLocatedCity = (state: RootState) => state.status.locatedCity
 export const selectIsLoading = (state: RootState) => state.status.isLoading
 
 // We can also write thunks by hand, which may contain both sync and async logic.

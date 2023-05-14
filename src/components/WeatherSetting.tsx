@@ -1,8 +1,9 @@
 import styled from "@emotion/styled"
 import { availableLocations } from "../utils/LocationMappings"
 import { ILocation } from "src/types/Weather.type"
-import { useAppDispatch } from "src/app/hooks"
-import { saveCurrPage } from "src/slices/statusSlice"
+import { useAppDispatch, useAppSelector } from "src/app/hooks"
+import { saveCurrPage, saveLocatedCity, selectLocatedCity } from "src/slices/statusSlice"
+import { useState } from "react"
 
 const SettingContainer = styled.div`
   position: relative;
@@ -94,17 +95,33 @@ const Save = styled.button`
 
 const WeatherSetting = () => {
   const dispatch = useAppDispatch()
+  const savedLocatedCity = useAppSelector(selectLocatedCity)
+  const [locatedCity, setLocatedCity] = useState(savedLocatedCity)
+
+  const handleLocationChange = (e: any) => {
+    setLocatedCity(e.target.value)
+  }
 
   const handlePageChange = () => {
+    dispatch(saveCurrPage("WeatherCard"))
+  }
+
+  const handleSave = () => {
+    dispatch(saveLocatedCity(locatedCity))
     dispatch(saveCurrPage("WeatherCard"))
   }
 
   return (
     <SettingContainer>
       <Title>設定</Title>
-      <StyledLabel htmlFor="location">地區</StyledLabel>
+      <StyledLabel htmlFor="locatedCity">地區</StyledLabel>
 
-      <StyledSelect id="location" name="location">
+      <StyledSelect
+        id="locatedCity"
+        name="locatedCity"
+        value={locatedCity}
+        onChange={handleLocationChange}
+      >
         {availableLocations.map(({ cityName }: ILocation) => (
           <option value={cityName} key={cityName}>
             {cityName}
@@ -114,7 +131,7 @@ const WeatherSetting = () => {
 
       <ButtonGroup>
         <Back onClick={handlePageChange}>返回</Back>
-        <Save>儲存</Save>
+        <Save onClick={handleSave}>儲存</Save>
       </ButtonGroup>
     </SettingContainer>
   )

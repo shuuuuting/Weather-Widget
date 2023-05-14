@@ -9,7 +9,8 @@ import WeatherIcon from "./ＷeatherIcon"
 import { getMoment } from "src/utils/MomentGetter"
 import useWeatherAPI from "src/hooks/useWeatherAPI"
 import { useAppDispatch, useAppSelector } from "src/app/hooks"
-import { saveCurrPage, saveCurrTheme, selectIsLoading } from "src/slices/statusSlice"
+import { saveCurrPage, saveCurrTheme, selectIsLoading, selectLocatedCity } from "src/slices/statusSlice"
+import { findLocation } from "src/utils/LocationMappings"
 
 const CardContainer = styled.div`
   position: relative;
@@ -115,19 +116,22 @@ const Cog = styled(CogIcon)`
   cursor: pointer;
 `
 
-const LOCATION_NAME = "臺北"
-const CITY_NAME = "臺北市"
-
 const WeatherCard = () => {
   const dispatch = useAppDispatch()
+  const locatedCity = useAppSelector(selectLocatedCity)
   const isLoading = useAppSelector(selectIsLoading)
+  const currLocation = useMemo(() => findLocation(locatedCity), [locatedCity])
+  const cityName = currLocation?.cityName ?? "臺北市"
+  const locationName = currLocation?.locationName ?? "臺北"
+  const sunriseCityName = currLocation?.sunriseCityName ?? "臺北市"
+
+  const moment = useMemo(() => getMoment(sunriseCityName), [sunriseCityName])
   const [weather, fetchWeatherData]: any = useWeatherAPI({
-    locationName: LOCATION_NAME,
-    cityName: CITY_NAME,
+    locationName,
+    cityName
   })
 
   const {
-    locationName,
     description,
     weatherCode,
     windSpeed,
@@ -136,8 +140,6 @@ const WeatherCard = () => {
     observationTime,
     comfortability,
   } = weather
-
-  const moment = useMemo(() => getMoment(CITY_NAME), [locationName])
 
   useEffect(() => {
     dispatch(saveCurrTheme(moment === "day" ? "light" : "dark"))
