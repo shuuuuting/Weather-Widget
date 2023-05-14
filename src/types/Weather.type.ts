@@ -34,8 +34,14 @@ export type IWeatherElement = {
 type ITimeElement = {
   startTime: string
   endTime: string
-  parameter: { 
-    parameterName: string 
-    parameterValue: string 
+  parameter: {
+    parameterName: string
+    parameterValue: string
+  }
 }
+
+export type ILocation = {
+  cityName: string
+  locationName: string
+  sunriseCityName: string
 }

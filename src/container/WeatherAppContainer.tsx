@@ -3,6 +3,7 @@ import styled from "@emotion/styled"
 import { useAppSelector } from "src/app/hooks"
 import { theme } from "src/assets/theme"
 import WeatherCard from "src/components/WeatherCard"
+import WeatherSetting from "src/components/WeatherSetting"
 import { selectTheme } from "src/slices/statusSlice"
 
 const AppContainer = styled.div`
@@ -20,6 +21,7 @@ const WeatherAppContainer = () => {
     <ThemeProvider theme={theme[currTheme]}>
         <AppContainer>
         <WeatherCard />
+        <WeatherSetting />
         </AppContainer>
     </ThemeProvider>
     )

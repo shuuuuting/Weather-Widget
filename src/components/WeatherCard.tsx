@@ -1,17 +1,14 @@
 import styled from "@emotion/styled"
-import { useEffect, useMemo, useState } from "react"
-import { fetchRealTimeWeather, fetchWeatherForecast } from "src/apis/Weather.api"
+import { useEffect, useMemo } from "react"
 import { ReactComponent as AirFlowIcon } from "src/images/airFlow.svg"
 import { ReactComponent as RainIcon } from "src/images/rain.svg"
 import { ReactComponent as RefreshIcon } from "src/images/refresh.svg"
 import { ReactComponent as LoadingIcon } from "src/images/loading.svg"
-import { IWeather, IWeatherElement } from "src/types/Weather.type"
 import WeatherIcon from "./ＷeatherIcon"
 import { getMoment } from "src/utils/MomentGetter"
 import useWeatherAPI from "src/hooks/useWeatherAPI"
 import { useAppDispatch, useAppSelector } from "src/app/hooks"
 import { saveTheme, selectIsLoading } from "src/slices/statusSlice"
-import { Button } from "@mui/material"
 
 const CardContainer = styled.div`
   position: relative;
