@@ -12,21 +12,12 @@ import { saveIsLoading } from "src/slices/statusSlice"
 const getRealTimeWeather = async (locationName: string) => {
   const res = await fetchRealTimeWeather(locationName)
   if ("data" in res) {
-    const locationData = res.data.location[0]
-    const weatherElements = locationData.weatherElement.reduce(
-      (neededElements: IRealTimeWeather, item: IWeatherElement) => {
-        if (["WDSD", "TEMP"].includes(item.elementName)) {
-          neededElements[item.elementName] = item.elementValue
-        }
-        return neededElements
-      },
-      {}
-    )
+    const locationData = res.data.Station[0]
     return {
       locationName: locationData.locationName,
-      windSpeed: weatherElements.WDSD,
-      temperature: weatherElements.TEMP,
-      observationTime: locationData.time.obsTime,
+      windSpeed: locationData.WeatherElement.WindSpeed,
+      temperature: locationData.WeatherElement.AirTemperature,
+      observationTime: locationData.ObsTime.DateTime,
     }
   }
   return {
